@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -14,26 +14,33 @@ import java.util.Set;
 @AllArgsConstructor
 public class Jogo {
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nome;
-    private Long valor;
+    private BigDecimal valor;
     private String descricao;
     private LocalDate dataLancamento;
     private String desenvolvedor;
     private String distribuidor;
+    private String categoria;
 
-    private String SO;
-    private String Armazenamento;
+    // requisitos
+    private String so;
+    private String armazenamento;
     private String processador;
     private String memoria;
     private String placaDeVideo;
 
-
-    @Enumerated(EnumType.ORDINAL)
+    // Plataformas (ex.: PC, PS5, Xbox)
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "jogo_plataformas", joinColumns = @JoinColumn(name = "jogo_id"))
+    @Column(name = "plataforma")
+    @Enumerated(EnumType.STRING)
     private List<Plataforma> plataformas;
 
-    @OneToMany(mappedBy = "imagem", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "jogo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Imagem> imagens;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -45,6 +52,6 @@ public class Jogo {
     private List<Categoria> categorias;
 
     @OneToMany(mappedBy = "jogo", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Key> keys;
-
 }

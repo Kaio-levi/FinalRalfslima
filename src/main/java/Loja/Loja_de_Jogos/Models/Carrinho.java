@@ -1,20 +1,27 @@
 package Loja.Loja_de_Jogos.Models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
-@Getter
-@Setter
+@NoArgsConstructor
+@Data
 public class Carrinho {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long idUsuario;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private Usuario usuario;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<CarrinhoJogo> carrinhoJogo;
+
+    @Enumerated(EnumType.ORDINAL)
+    private Status status;
+
 }

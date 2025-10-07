@@ -2,23 +2,25 @@ package Loja.Loja_de_Jogos.Models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import javax.xml.crypto.Data;
+import java.time.LocalDate;
+
 
 @Entity
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Pedido {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
+    @OneToOne(fetch = FetchType.LAZY)
     private Carrinho carrinho;
-    private Data datapedido;
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Usuario usuario;
+    private LocalDate datapedido;
+    @Enumerated(EnumType.ORDINAL)
     private Status status;
 }

@@ -16,8 +16,12 @@ public class Key {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long Id;
-    private Long IdJogo;
+
     private Long codigo;
-    @Enumerated(EnumType.STRING)
+
+    @Enumerated(EnumType.ORDINAL)
     private Status status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Jogo jogo;
 }

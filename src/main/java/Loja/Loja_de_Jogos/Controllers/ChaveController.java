@@ -1,7 +1,7 @@
 package Loja.Loja_de_Jogos.Controllers;
 
-import Loja.Loja_de_Jogos.Models.Key;
-import Loja.Loja_de_Jogos.Repositories.KeyRepository;
+import Loja.Loja_de_Jogos.Models.Chave;
+import Loja.Loja_de_Jogos.Repositories.ChaveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,32 +11,32 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/keys")
 @CrossOrigin(origins = "*")
-public class KeyController {
+public class ChaveController {
 
     @Autowired
-    private KeyRepository keyRepository;
+    private ChaveRepository chaveRepository;
 
     @GetMapping
-    public List<Key> listarTodas() {
-        return keyRepository.findAll();
+    public List<Chave> listarTodas() {
+        return chaveRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Key> buscarPorId(@PathVariable Long id) {
-        return keyRepository.findById(id)
+    public ResponseEntity<Chave> buscarPorId(@PathVariable Long id) {
+        return chaveRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Key> criar(@RequestBody Key key) {
-        return ResponseEntity.ok(keyRepository.save(key));
+    public ResponseEntity<Chave> criar(@RequestBody Chave chave) {
+        return ResponseEntity.ok(chaveRepository.save(chave));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        if (!keyRepository.existsById(id)) return ResponseEntity.notFound().build();
-        keyRepository.deleteById(id);
+        if (!chaveRepository.existsById(id)) return ResponseEntity.notFound().build();
+        chaveRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

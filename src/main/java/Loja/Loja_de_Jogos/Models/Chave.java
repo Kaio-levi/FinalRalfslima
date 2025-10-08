@@ -1,23 +1,19 @@
 package Loja.Loja_de_Jogos.Models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Key {
+public class Chave {
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long Id;
 
-    private Long codigo;
+    private String codigo;
 
     @Enumerated(EnumType.ORDINAL)
     private Status status;

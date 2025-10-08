@@ -18,7 +18,7 @@ public class Carrinho {
     @OneToOne(fetch = FetchType.LAZY)
     private Usuario usuario;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "carrinho", fetch = FetchType.LAZY)
     private List<CarrinhoJogo> carrinhoJogo;
 
     @Enumerated(EnumType.ORDINAL)

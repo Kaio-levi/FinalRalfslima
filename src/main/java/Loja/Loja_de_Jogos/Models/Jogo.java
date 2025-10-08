@@ -53,5 +53,5 @@ public class Jogo {
 
     @OneToMany(mappedBy = "jogo", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Key> keys;
+    private List<Chave> chaves;
 }

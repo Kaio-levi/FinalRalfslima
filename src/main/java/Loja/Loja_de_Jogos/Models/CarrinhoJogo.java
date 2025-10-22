@@ -18,12 +18,12 @@ public class CarrinhoJogo {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idCarrinho",insertable = false,updatable = false)
+    @JoinColumn(name = "**idCarrinho**", insertable = false, updatable = false)
     private Carrinho carrinho;
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "idJogo",insertable = false,updatable = false)
+    @JoinColumn(name = "**idJogo**", insertable = false, updatable = false)
     private Jogo jogo;
 
     @Column(name = "quantidade")

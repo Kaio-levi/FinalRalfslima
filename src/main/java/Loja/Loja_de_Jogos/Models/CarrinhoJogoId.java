@@ -17,9 +17,9 @@ public class CarrinhoJogoId implements Serializable {
 
     @JsonIgnore
     @Column(name = "idCarrinho")
-    private Integer idCarrinho;
+    private Long idCarrinho;
 
     @JsonIgnore
     @Column(name = "idJogo")
-    private Integer idJogo;
+    private Long idJogo;
 }

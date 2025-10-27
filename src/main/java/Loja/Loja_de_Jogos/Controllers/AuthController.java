@@ -1,52 +1,54 @@
 package Loja.Loja_de_Jogos.Controllers;
 
-import Loja.Loja_de_Jogos.DTO.AuthRequest;
-import Loja.Loja_de_Jogos.DTO.AuthResponse;
-import Loja.Loja_de_Jogos.Security.JwtUtil;
-import org.springframework.http.HttpStatus; // Importar HttpStatus
+import Loja.Loja_de_Jogos.DTO.AuthenticationDTO;
+import Loja.Loja_de_Jogos.DTO.LoginResponseDTO;
+import Loja.Loja_de_Jogos.DTO.RegisterDTO;
+import Loja.Loja_de_Jogos.Models.Usuario;
+import Loja.Loja_de_Jogos.Repositories.UsuarioRepository;
+import Loja.Loja_de_Jogos.Security.security.TokenService;
 import org.springframework.http.ResponseEntity; // Importar ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException; // Importar AuthenticationException
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+    private final AuthenticationManager authenticationManager;
+
+    private final UsuarioRepository userRepository;
+
+    private final TokenService tokenService;
+
+    public AuthController(AuthenticationManager authenticationManager, UsuarioRepository userRepository, TokenService tokenService) {
         this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            authRequest.getEmail(),
-                            authRequest.getPassword()
-                    )
-            );
+    public ResponseEntity login(@RequestBody AuthenticationDTO dto){
+        var usernamePassword = new UsernamePasswordAuthenticationToken(dto.login(), dto.password());
+        var auth = this.authenticationManager.authenticate(usernamePassword);
 
-            String token = jwtUtil.generateToken(authentication.getName());
+        var token = tokenService.generateToken((Usuario) auth.getPrincipal());
 
-            return ResponseEntity.ok(new AuthResponse(token));
+        return ResponseEntity.ok(new LoginResponseDTO(token));
+    }
 
-        } catch (AuthenticationException e) {
-            System.err.println("Falha na Autenticação para usuário [" + authRequest.getEmail() + "]: " + e.getMessage());
+    @PostMapping("/register")
+    public ResponseEntity register(@RequestBody RegisterDTO dto){
+        if(this.userRepository.findByEmail(dto.email()) != null)
+            return ResponseEntity.badRequest().build();
 
-            AuthResponse errorResponse = new AuthResponse("Credenciais inválidas. Verifique seu e-mail e senha.");
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(errorResponse);
-        }
+        String cryptedPassword = new BCryptPasswordEncoder().encode(dto.password());
+        Usuario newUser = new Usuario(dto.cpf(),dto.nome(),dto.email(), cryptedPassword,dto.telefone(), dto.role());
+
+        this.userRepository.save(newUser);
+        return ResponseEntity.ok().build();
     }
 }

@@ -2,6 +2,8 @@ package Loja.Loja_de_Jogos.Controllers;
 
 import Loja.Loja_de_Jogos.Models.Usuario;
 import Loja.Loja_de_Jogos.Repositories.UsuarioRepository;
+import Loja.Loja_de_Jogos.Services.UsuarioService;
+import Loja.Loja_de_Jogos.dtos.UsuarioDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,39 +16,23 @@ import java.util.List;
 public class UsuarioController {
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UsuarioService usuarioService;
 
     @GetMapping
-    public List<Usuario> listarTodos() {
-        return usuarioRepository.findAll();
+    public List<UsuarioDTO> listarTodos() {
+        return usuarioService.listarTodos();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> buscarPorId(@PathVariable Long id) {
-        return usuarioRepository.findById(id)
+        return usuarioService.buscarPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<Usuario> criar(@RequestBody Usuario usuario) {
-        return ResponseEntity.ok(usuarioRepository.save(usuario));
+        return ResponseEntity.ok(usuarioService.salvar(usuario));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Usuario> atualizar(@PathVariable Long id, @RequestBody Usuario novo) {
-        return usuarioRepository.findById(id).map(usuario -> {
-            usuario.setNome(novo.getNome());
-            usuario.setEmail(novo.getEmail());
-            usuario.setSenha(novo.getSenha());
-            return ResponseEntity.ok(usuarioRepository.save(usuario));
-        }).orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        if (!usuarioRepository.existsById(id)) return ResponseEntity.notFound().build();
-        usuarioRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
 }

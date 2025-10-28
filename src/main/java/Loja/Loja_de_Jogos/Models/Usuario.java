@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,7 +41,8 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
     private List<Pedido> pedidos;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
     private Carrinho carrinho;
 
     public Usuario(String cpf, String nome, String email, String senha, String telefone, UserRole role) {
@@ -50,6 +52,8 @@ public class Usuario implements UserDetails {
         this.senha = senha;
         this.telefone = telefone;
         this.role = role;
+        this.datacriacao = LocalDate.now();
+        this.pedidos = new ArrayList<>();
     }
 
     @Override

@@ -1,7 +1,8 @@
 package Loja.Loja_de_Jogos.Controllers;
 
 import Loja.Loja_de_Jogos.Models.Imagem;
-import Loja.Loja_de_Jogos.Repositories.ImagemRepository;
+import Loja.Loja_de_Jogos.dtos.ImagemDTO;
+import Loja.Loja_de_Jogos.Services.ImagemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,22 +15,30 @@ import java.util.List;
 public class ImagemController {
 
     @Autowired
-    private ImagemRepository imagemRepository;
+    private ImagemService imagemService;
 
     @GetMapping
-    public List<Imagem> listarTodas() {
-        return imagemRepository.findAll();
+    public List<ImagemDTO> listarTodas() {
+        return imagemService.listarTodas().stream().map(ImagemDTO::new).toList();
     }
 
     @PostMapping
-    public ResponseEntity<Imagem> criar(@RequestBody Imagem imagem) {
-        return ResponseEntity.ok(imagemRepository.save(imagem));
+    public ResponseEntity<ImagemDTO> criar(@RequestBody Imagem imagem) {
+        Imagem novaImagem = imagemService.salvar(imagem);
+        return ResponseEntity.ok(new ImagemDTO(novaImagem));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ImagemDTO> buscarPorId(@PathVariable Long id) {
+        return imagemService.buscarPorId(id)
+                .map(imagem -> ResponseEntity.ok(new ImagemDTO(imagem)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        if (!imagemRepository.existsById(id)) return ResponseEntity.notFound().build();
-        imagemRepository.deleteById(id);
+        if (!imagemService.existePorId(id)) return ResponseEntity.notFound().build();
+        imagemService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 }

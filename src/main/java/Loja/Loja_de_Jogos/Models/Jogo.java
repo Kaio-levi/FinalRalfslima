@@ -40,7 +40,6 @@ public class Jogo {
     private List<Plataforma> plataformas;
 
     @OneToMany(mappedBy = "jogo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Imagem> imagens;
 
     @ManyToMany(fetch = FetchType.LAZY)

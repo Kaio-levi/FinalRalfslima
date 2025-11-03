@@ -24,15 +24,16 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<UsuarioDTO> buscarPorId(@PathVariable Long id) {
         return usuarioService.buscarPorId(id)
-                .map(ResponseEntity::ok)
+                .map(usuario -> ResponseEntity.ok(UsuarioDTO.fromEntity(usuario)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Usuario> criar(@RequestBody Usuario usuario) {
-        return ResponseEntity.ok(usuarioService.salvar(usuario));
+    public ResponseEntity<UsuarioDTO> criar(@RequestBody Usuario usuario) {
+        Usuario novoUsuario = usuarioService.salvar(usuario);
+        return ResponseEntity.ok(UsuarioDTO.fromEntity(novoUsuario));
     }
 
 }

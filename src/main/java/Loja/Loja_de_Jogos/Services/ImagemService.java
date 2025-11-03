@@ -9,6 +9,9 @@ import java.util.Optional;
 
 @Service
 public class ImagemService {
+    public boolean existePorId(Long id) {
+        return imagemRepository.existsById(id);
+    }
 
     @Autowired
     private ImagemRepository imagemRepository;

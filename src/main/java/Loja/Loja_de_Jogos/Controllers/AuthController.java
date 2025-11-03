@@ -1,7 +1,7 @@
 package Loja.Loja_de_Jogos.Controllers;
 
 import Loja.Loja_de_Jogos.Models.Usuario;
-import Loja.Loja_de_Jogos.Repositories.UsuarioRepository;
+import Loja.Loja_de_Jogos.Services.UsuarioService;
 import Loja.Loja_de_Jogos.dtos.AuthenticationDTO;
 import Loja.Loja_de_Jogos.dtos.LoginResponseDTO;
 import Loja.Loja_de_Jogos.dtos.RegisterDTO;
@@ -21,13 +21,13 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
 
-    private final UsuarioRepository userRepository;
+    private final UsuarioService usuarioService;
 
     private final TokenService tokenService;
 
-    public AuthController(AuthenticationManager authenticationManager, UsuarioRepository userRepository, TokenService tokenService) {
+    public AuthController(AuthenticationManager authenticationManager, UsuarioService usuarioService, TokenService tokenService) {
         this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
+        this.usuarioService = usuarioService;
         this.tokenService = tokenService;
     }
 
@@ -46,13 +46,13 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody RegisterDTO dto) {
-        if (this.userRepository.findByEmail(dto.email()) != null)
+        if (usuarioService.emailExiste(dto.email()))
             return ResponseEntity.badRequest().build();
 
         String cryptedPassword = new BCryptPasswordEncoder().encode(dto.senha());
         Usuario newUser = new Usuario(dto.cpf(), dto.nome(), dto.email(), cryptedPassword, dto.telefone(), dto.role());
 
-        this.userRepository.save(newUser);
+        usuarioService.salvar(newUser);
 
         UsuarioDTO usuarioDTO = UsuarioDTO.fromEntity(newUser);
         return ResponseEntity.ok(usuarioDTO);

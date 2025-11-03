@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
+    public boolean emailExiste(String email) {
+        return usuarioRepository.findByEmail(email) != null;
+    }
 
 
     private UsuarioRepository usuarioRepository;

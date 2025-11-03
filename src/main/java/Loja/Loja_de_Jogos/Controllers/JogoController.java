@@ -1,8 +1,12 @@
 package Loja.Loja_de_Jogos.Controllers;
 
 import Loja.Loja_de_Jogos.Models.Jogo;
+import Loja.Loja_de_Jogos.dtos.JogoDTO;
 import Loja.Loja_de_Jogos.Repositories.JogoRepository;
+import Loja.Loja_de_Jogos.Services.JogoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,56 +14,44 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/jogos")
-@CrossOrigin(origins = "*") // permite o front acessar
+@CrossOrigin(origins = "*")
 public class JogoController {
 
     @Autowired
-    private JogoRepository jogoRepository;
+    private JogoService jogoService;
 
     @GetMapping
-    public List<Jogo> listarTodos() {
-        return jogoRepository.findAll();
+    public ResponseEntity<Page<JogoDTO>> listarTodos(Pageable pageable) {
+        Page<JogoDTO> jogosPaginados = jogoService.listarTodos(pageable).map(JogoDTO::new);
+        return ResponseEntity.ok(jogosPaginados);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Jogo> buscarPorId(@PathVariable Long id) {
-        return jogoRepository.findById(id)
-                .map(ResponseEntity::ok)
+    public ResponseEntity<JogoDTO> buscarPorId(@PathVariable Long id) {
+        return jogoService.buscarPorId(id)
+                .map(jogo -> ResponseEntity.ok(new JogoDTO(jogo)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Jogo> criar(@RequestBody Jogo jogo) {
-        Jogo novoJogo = jogoRepository.save(jogo);
-        return ResponseEntity.ok(novoJogo);
+    public ResponseEntity<JogoDTO> criar(@RequestBody Jogo jogo) {
+        Jogo novoJogo = jogoService.criar(jogo);
+        return ResponseEntity.ok(new JogoDTO(novoJogo));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Jogo> atualizar(@PathVariable Long id, @RequestBody Jogo jogoAtualizado) {
-        return jogoRepository.findById(id).map(jogo -> {
-            jogo.setNome(jogoAtualizado.getNome());
-            jogo.setValor(jogoAtualizado.getValor());
-            jogo.setDescricao(jogoAtualizado.getDescricao());
-            jogo.setDataLancamento(jogoAtualizado.getDataLancamento());
-            jogo.setDesenvolvedor(jogoAtualizado.getDesenvolvedor());
-            jogo.setDistribuidor(jogoAtualizado.getDistribuidor());
-            jogo.setSo(jogoAtualizado.getSo());
-            jogo.setArmazenamento(jogoAtualizado.getArmazenamento());
-            jogo.setProcessador(jogoAtualizado.getProcessador());
-            jogo.setMemoria(jogoAtualizado.getMemoria());
-            jogo.setPlacaDeVideo(jogoAtualizado.getPlacaDeVideo());
-            jogo.setPlataformas(jogoAtualizado.getPlataformas());
-            jogo.setCategorias(jogoAtualizado.getCategorias());
-            return ResponseEntity.ok(jogoRepository.save(jogo));
-        }).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<JogoDTO> atualizar(@PathVariable Long id, @RequestBody Jogo jogoAtualizado) {
+        return jogoService.atualizar(id, jogoAtualizado)
+                .map(jogo -> ResponseEntity.ok(new JogoDTO(jogo)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        if (!jogoRepository.existsById(id)) {
+        if (!jogoService.existePorId(id)) { // Uso do Service
             return ResponseEntity.notFound().build();
         }
-        jogoRepository.deleteById(id);
+        jogoService.deletar(id); // Uso do Service
         return ResponseEntity.noContent().build();
     }
 }

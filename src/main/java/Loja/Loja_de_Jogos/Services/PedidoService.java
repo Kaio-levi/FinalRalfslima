@@ -9,6 +9,17 @@ import java.util.Optional;
 
 @Service
 public class PedidoService {
+    public Optional<Pedido> atualizar(Long id, Pedido pedidoAtualizado) {
+        return pedidoRepository.findById(id).map(pedidoExistente -> {
+            // Adicione lógica de atualização conforme necessário
+            // Exemplo: pedidoExistente.setStatus(pedidoAtualizado.getStatus());
+            return pedidoRepository.save(pedidoExistente);
+        });
+    }
+
+    public boolean existePorId(Long id) {
+        return pedidoRepository.existsById(id);
+    }
 
     @Autowired
     private PedidoRepository pedidoRepository;

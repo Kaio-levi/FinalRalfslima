@@ -20,6 +20,9 @@ public class Categoria {
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
+    private String descricao;
+    private String imagemUrl;
+    private boolean isActive = true;
 
     @JsonIgnore // evita recursão infinita na serialização JSON
     @ManyToMany(mappedBy = "categorias")

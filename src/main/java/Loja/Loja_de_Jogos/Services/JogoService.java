@@ -3,9 +3,10 @@ package Loja.Loja_de_Jogos.Services;
 import Loja.Loja_de_Jogos.Models.Jogo;
 import Loja.Loja_de_Jogos.Repositories.JogoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -14,42 +15,43 @@ public class JogoService {
     @Autowired
     private JogoRepository jogoRepository;
 
-    public List<Jogo> listarTodos() {
-        return jogoRepository.findAll();
+    public Page<Jogo> listarTodos(Pageable pageable) {
+        return jogoRepository.findAll(pageable);
     }
 
     public Optional<Jogo> buscarPorId(Long id) {
         return jogoRepository.findById(id);
     }
 
-    public Jogo salvar(Jogo jogo) {
+    public Jogo criar(Jogo jogo) {
         return jogoRepository.save(jogo);
     }
 
     public Optional<Jogo> atualizar(Long id, Jogo jogoAtualizado) {
-        return jogoRepository.findById(id).map(jogo -> {
-            jogo.setNome(jogoAtualizado.getNome());
-            jogo.setValor(jogoAtualizado.getValor());
-            jogo.setDescricao(jogoAtualizado.getDescricao());
-            jogo.setDataLancamento(jogoAtualizado.getDataLancamento());
-            jogo.setDesenvolvedor(jogoAtualizado.getDesenvolvedor());
-            jogo.setDistribuidor(jogoAtualizado.getDistribuidor());
-            jogo.setSo(jogoAtualizado.getSo());
-            jogo.setArmazenamento(jogoAtualizado.getArmazenamento());
-            jogo.setProcessador(jogoAtualizado.getProcessador());
-            jogo.setMemoria(jogoAtualizado.getMemoria());
-            jogo.setPlacaDeVideo(jogoAtualizado.getPlacaDeVideo());
-            jogo.setPlataformas(jogoAtualizado.getPlataformas());
-            jogo.setCategorias(jogoAtualizado.getCategorias());
-            return jogoRepository.save(jogo);
+        return jogoRepository.findById(id).map(jogoExistente -> {
+            // Lógica de atualização
+            jogoExistente.setNome(jogoAtualizado.getNome());
+            jogoExistente.setValor(jogoAtualizado.getValor());
+            jogoExistente.setDescricao(jogoAtualizado.getDescricao());
+            jogoExistente.setDataLancamento(jogoAtualizado.getDataLancamento());
+            jogoExistente.setDesenvolvedor(jogoAtualizado.getDesenvolvedor());
+            jogoExistente.setDistribuidor(jogoAtualizado.getDistribuidor());
+            jogoExistente.setSo(jogoAtualizado.getSo());
+            jogoExistente.setArmazenamento(jogoAtualizado.getArmazenamento());
+            jogoExistente.setProcessador(jogoAtualizado.getProcessador());
+            jogoExistente.setMemoria(jogoAtualizado.getMemoria());
+            jogoExistente.setPlacaDeVideo(jogoAtualizado.getPlacaDeVideo());
+            jogoExistente.setPlataformas(jogoAtualizado.getPlataformas());
+            jogoExistente.setCategorias(jogoAtualizado.getCategorias());
+
+            return jogoRepository.save(jogoExistente);
         });
     }
-
-    public boolean deletar(Long id) {
-        if (!jogoRepository.existsById(id)) {
-            return false;
-        }
+    public void deletar(Long id) {
         jogoRepository.deleteById(id);
-        return true;
+    }
+
+    public boolean existePorId(Long id) {
+        return jogoRepository.existsById(id);
     }
 }

@@ -9,6 +9,9 @@ import java.util.Optional;
 
 @Service
 public class CategoriaService {
+    public boolean existePorId(Long id) {
+        return categoriaRepository.existsById(id);
+    }
 
     @Autowired
     private CategoriaRepository categoriaRepository;

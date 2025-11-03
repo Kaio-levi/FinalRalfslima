@@ -38,6 +38,10 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         // 🔓 Swagger liberado
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
+                        .requestMatchers(HttpMethod.GET).permitAll()
+                        .requestMatchers(HttpMethod.POST).permitAll()
+                        .requestMatchers(HttpMethod.PUT).permitAll()
+                        .requestMatchers(HttpMethod.DELETE).permitAll()
 
                         // 🔓 Endpoints públicos
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()

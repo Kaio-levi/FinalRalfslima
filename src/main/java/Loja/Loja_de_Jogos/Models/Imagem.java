@@ -1,5 +1,6 @@
 package Loja.Loja_de_Jogos.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +18,11 @@ public class Imagem {
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
+    private String url;
+    private String altText;
+    private boolean isMainImage = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Jogo jogo;
 }

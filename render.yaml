@@ -1,0 +1,12 @@
+# Render configuration for the backend service (FinalRalfslima)
+# Place this file in the root of the backend repository before connecting to Render
+
+services:
+  - type: web
+    name: loja-backend
+    env: java
+    # path is repo root when this file is in the backend repo
+    path: .
+    buildCommand: ./mvnw -B -DskipTests package
+    startCommand: java -Dserver.port=$PORT -jar target/*.jar
+    plan: free

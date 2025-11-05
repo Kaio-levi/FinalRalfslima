@@ -11,8 +11,10 @@ import java.util.Optional;
 public class PedidoService {
     public Optional<Pedido> atualizar(Long id, Pedido pedidoAtualizado) {
         return pedidoRepository.findById(id).map(pedidoExistente -> {
-            // Adicione lógica de atualização conforme necessário
-            // Exemplo: pedidoExistente.setStatus(pedidoAtualizado.getStatus());
+            if (pedidoAtualizado.getStatus() != null) {
+                pedidoExistente.setStatus(pedidoAtualizado.getStatus());
+            }
+            // Adicione outras atualizações se necessário
             return pedidoRepository.save(pedidoExistente);
         });
     }

@@ -41,10 +41,6 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
     private List<Pedido> pedidos;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonIgnore
-    private Carrinho carrinho;
-
     public Usuario(String cpf, String nome, String email, String senha, String telefone, UserRole role) {
         this.cpf = cpf;
         this.nome = nome;

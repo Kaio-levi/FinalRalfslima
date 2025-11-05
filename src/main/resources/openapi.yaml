@@ -1,0 +1,383 @@
+openapi: 3.0.1
+info:
+  title: Loja de Jogos API
+  description: API para gerenciamento de jogos, usuários, pedidos, categorias e carrinho.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/jogos:
+    get:
+      summary: Lista todos os jogos
+      responses:
+        '200':
+          description: Lista de jogos
+    post:
+      summary: Cria um novo jogo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Jogo'
+      responses:
+        '200':
+          description: Jogo criado
+  /api/jogos/{id}:
+    get:
+      summary: Busca jogo por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Jogo encontrado
+        '404':
+          description: Não encontrado
+    put:
+      summary: Atualiza um jogo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Jogo'
+      responses:
+        '200':
+          description: Jogo atualizado
+        '404':
+          description: Não encontrado
+    delete:
+      summary: Remove um jogo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Removido com sucesso
+        '404':
+          description: Não encontrado
+  /api/carrinho:
+    get:
+      summary: Lista todos os carrinhos
+      responses:
+        '200':
+          description: Lista de carrinhos
+    post:
+      summary: Cria um novo carrinho
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Carrinho'
+      responses:
+        '200':
+          description: Carrinho criado
+  /api/carrinho/{id}:
+    get:
+      summary: Busca carrinho por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Carrinho encontrado
+        '404':
+          description: Não encontrado
+    delete:
+      summary: Remove um carrinho
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Removido com sucesso
+        '404':
+          description: Não encontrado
+  /api/carrinho/items:
+    post:
+      summary: Adiciona item ao carrinho
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddToCartDTO'
+      responses:
+        '200':
+          description: Carrinho atualizado
+  /api/categorias:
+    get:
+      summary: Lista todas as categorias
+      responses:
+        '200':
+          description: Lista de categorias
+    post:
+      summary: Cria uma nova categoria
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+      responses:
+        '200':
+          description: Categoria criada
+  /api/categorias/{id}:
+    get:
+      summary: Busca categoria por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Categoria encontrada
+        '404':
+          description: Não encontrada
+    delete:
+      summary: Remove uma categoria
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Removida com sucesso
+        '404':
+          description: Não encontrada
+  /api/pedidos:
+    get:
+      summary: Lista todos os pedidos
+      responses:
+        '200':
+          description: Lista de pedidos
+    post:
+      summary: Cria um novo pedido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pedido'
+      responses:
+        '200':
+          description: Pedido criado
+  /api/pedidos/{id}:
+    get:
+      summary: Busca pedido por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Pedido encontrado
+        '404':
+          description: Não encontrado
+    put:
+      summary: Atualiza um pedido
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pedido'
+      responses:
+        '200':
+          description: Pedido atualizado
+        '404':
+          description: Não encontrado
+    delete:
+      summary: Remove um pedido
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Removido com sucesso
+        '404':
+          description: Não encontrado
+  /api/usuarios:
+    get:
+      summary: Lista todos os usuários
+      responses:
+        '200':
+          description: Lista de usuários
+    post:
+      summary: Cria um novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        '200':
+          description: Usuário criado
+  /api/usuarios/{id}:
+    get:
+      summary: Busca usuário por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuário encontrado
+        '404':
+          description: Não encontrado
+  /auth/login:
+    post:
+      summary: Login do usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationDTO'
+      responses:
+        '200':
+          description: Token de autenticação
+  /auth/register:
+    post:
+      summary: Cadastro de usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDTO'
+      responses:
+        '200':
+          description: Usuário cadastrado
+components:
+  schemas:
+    Jogo:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        valor:
+          type: number
+        descricao:
+          type: string
+        imagens:
+          type: array
+          items:
+            type: object
+        categoria:
+          type: string
+    Carrinho:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        cartGames:
+          type: array
+          items:
+            type: object
+    AddToCartDTO:
+      type: object
+      properties:
+        gameId:
+          type: integer
+        quantity:
+          type: integer
+    Categoria:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+    Pedido:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        dataCriacao:
+          type: string
+        itens:
+          type: array
+          items:
+            type: object
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        email:
+          type: string
+        cpf:
+          type: string
+        telefone:
+          type: string
+        role:
+          type: string
+    AuthenticationDTO:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    RegisterDTO:
+      type: object
+      properties:
+        nome:
+          type: string
+        email:
+          type: string
+        senha:
+          type: string
+        cpf:
+          type: string
+        telefone:
+          type: string
+        role:
+          type: string

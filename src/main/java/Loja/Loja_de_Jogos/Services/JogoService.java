@@ -1,6 +1,7 @@
 package Loja.Loja_de_Jogos.Services;
 
 import Loja.Loja_de_Jogos.Models.Jogo;
+import Loja.Loja_de_Jogos.Models.Imagem;
 import Loja.Loja_de_Jogos.Repositories.JogoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,15 +16,32 @@ public class JogoService {
     @Autowired
     private JogoRepository jogoRepository;
 
+
     public Page<Jogo> listarTodos(Pageable pageable) {
-        return jogoRepository.findAll(pageable);
+        Page<Jogo> page = jogoRepository.findAll(pageable);
+        // Força o carregamento das imagens para cada jogo
+        page.forEach(jogo -> {
+            if (jogo.getImagens() != null) {
+                jogo.getImagens().size();
+            }
+        });
+        return page;
     }
 
     public Optional<Jogo> buscarPorId(Long id) {
-        return jogoRepository.findById(id);
+        Optional<Jogo> opt = jogoRepository.findById(id);
+        opt.ifPresent(jogo -> {
+            if (jogo.getImagens() != null) {
+                jogo.getImagens().size();
+            }
+        });
+        return opt;
     }
 
     public Jogo criar(Jogo jogo) {
+        if (jogo.getImagens() != null) {
+            jogo.getImagens().forEach(img -> img.setJogo(jogo));
+        }
         return jogoRepository.save(jogo);
     }
 
@@ -43,7 +61,10 @@ public class JogoService {
             jogoExistente.setPlacaDeVideo(jogoAtualizado.getPlacaDeVideo());
             jogoExistente.setPlataformas(jogoAtualizado.getPlataformas());
             jogoExistente.setCategorias(jogoAtualizado.getCategorias());
-
+            if (jogoAtualizado.getImagens() != null) {
+                jogoAtualizado.getImagens().forEach(img -> img.setJogo(jogoExistente));
+                jogoExistente.setImagens(jogoAtualizado.getImagens());
+            }
             return jogoRepository.save(jogoExistente);
         });
     }

@@ -16,11 +16,15 @@ public class Pedido {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(fetch = FetchType.LAZY)
-    private Carrinho carrinho;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Usuario usuario;
+
     private LocalDate datapedido;
+
     @Enumerated(EnumType.ORDINAL)
     private Status status;
+
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private java.util.List<PedidoItem> itens;
 }

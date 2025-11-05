@@ -19,7 +19,6 @@ public class Imagem {
     private Long id;
     private String nome;
     private String url;
-    private String altText;
     private boolean isMainImage = false;
 
     @ManyToOne(fetch = FetchType.LAZY)

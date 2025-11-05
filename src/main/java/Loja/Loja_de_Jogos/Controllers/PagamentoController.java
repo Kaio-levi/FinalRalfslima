@@ -23,8 +23,10 @@ public class PagamentoController {
     // POST /api/merchant/v1/payment-intents
     @PostMapping("/merchant/v1/payment-intents")
     public ResponseEntity<?> criarIntent(@RequestBody Map<String, Object> payload) {
+        System.out.println("[LOG] [INTENT] Recebida requisição de criação de intent: " + payload);
         try {
             Map<String, Object> resposta = pagamentoService.criarIntentPagamento(payload);
+            System.out.println("[LOG] [INTENT] Resposta da criação de intent: " + resposta);
             // Se resposta contém "id", retorne direto, senão se contém "data", retorne data, senão resposta completa
             if (resposta != null && resposta.containsKey("id")) {
                 return ResponseEntity.ok(resposta);
@@ -36,6 +38,7 @@ public class PagamentoController {
             }
             return ResponseEntity.ok(resposta);
         } catch (Exception e) {
+            System.out.println("[LOG] [INTENT] Erro ao criar intent: " + e.getMessage());
             return ResponseEntity.status(500).body(Map.of("error", Map.of("success", false, "message", e.getMessage())));
         }
     }

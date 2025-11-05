@@ -17,31 +17,6 @@ import java.time.Instant;
 
 @Service
 public class PagamentoService {
-    // Teste: cria uma intent de pagamento com dados fixos e loga a resposta
-    public void testarCriarIntent() {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("orderId", "00001");
-        payload.put("amount", 18);
-        payload.put("currency", "BRL");
-        payload.put("paymentMethod", "credit_card");
-        Map<String, Object> customer = new HashMap<>();
-        customer.put("name", "Usuario Teste");
-        customer.put("email", "teste@bankr.com");
-        payload.put("customer", customer);
-        payload.put("callbackUrl", "http://localhost:3001/webhooks/trustpay");
-        payload.put("returnUrl", "http://localhost:3001/checkout/success");
-        Map<String, Object> installments = new HashMap<>();
-        installments.put("quantity", 1);
-        payload.put("installments", installments);
-        try {
-            Map<String, Object> resposta = criarIntentPagamento(payload);
-            System.out.println("[TRUSTPAY-DEBUG] Resposta da criação de intent:");
-            System.out.println(resposta);
-        } catch (Exception e) {
-            System.out.println("[TRUSTPAY-DEBUG] Erro ao criar intent:");
-            e.printStackTrace();
-        }
-    }
 
     @Value("${pagamento.api.url}")
     private String pagamentoApiUrl;
@@ -88,48 +63,65 @@ public class PagamentoService {
     }
 
     public Map<String, Object> criarIntentPagamento(Map<String, Object> payload) {
-        System.out.println("INTENCAO PAGAMENTO");
         try {
-            // Montar novo payload EXATAMENTE igual ao exemplo fornecido, preenchendo valores padrão se necessário
-            // Montar payload do intent exatamente igual e na mesma ordem do exemplo fornecido
-            Map<String, Object> intentPayload = new LinkedHashMap<>();
-            intentPayload.put("orderId", payload.getOrDefault("orderId", "00001"));
-            intentPayload.put("amount", payload.getOrDefault("amount", 18));
-            intentPayload.put("currency", payload.getOrDefault("currency", "BRL"));
-            intentPayload.put("paymentMethod", payload.getOrDefault("paymentMethod", "credit_card"));
-            // customer
-            Object customerObj = payload.get("customer");
-            if (customerObj instanceof Map) {
-                intentPayload.put("customer", customerObj);
-            } else {
-                Map<String, Object> customer = new LinkedHashMap<>();
-                Object name = payload.get("name");
-                Object email = payload.get("email");
-                customer.put("name", name != null ? name : "Usuario Teste");
-                customer.put("email", email != null ? email : "usuario@teste.com");
-                intentPayload.put("customer", customer);
-            }
-            intentPayload.put("callbackUrl", payload.getOrDefault("callbackUrl", "http://localhost:3001/webhooks/trustpay"));
-            intentPayload.put("returnUrl", payload.getOrDefault("returnUrl", "http://localhost:3001/checkout/success"));
-            // installments deve ser um objeto { "quantity": 1 }
-            Object installmentsObj = payload.get("installments");
-            if (installmentsObj instanceof Map) {
-                intentPayload.put("installments", installmentsObj);
-            } else {
-                Map<String, Object> installments = new LinkedHashMap<>();
-                installments.put("quantity", installmentsObj != null ? installmentsObj : 1);
-                intentPayload.put("installments", installments);
-            }
-
-            String rawBody = objectMapper.writeValueAsString(intentPayload);
-            // Log detalhado do payload enviado ao proxy TrustPay
-            System.out.println("[TRUSTPAY-DEBUG] Payload enviado ao proxy TrustPay:");
-            System.out.println(rawBody);
-
-            String method = "POST";
             String path = "/api/merchant/v1/payment-intents";
             String url = pagamentoApiUrl + path;
+            Map<String, Object> intentPayload = new HashMap<>();
+            intentPayload.put("orderId", String.valueOf(payload.getOrDefault("orderId", "00001")));
+            intentPayload.put("amount", payload.getOrDefault("amount", 18));
+            intentPayload.put("currency", payload.getOrDefault("currency", "BRL"));
+            intentPayload.put("paymentMethod", "credit_card");
+            Map<String, Object> customer = new HashMap<>();
+            Object name = payload.get("cardHolderName");
+            if (name == null) name = payload.get("name");
+            customer.put("name", name != null ? name : "Usuario Teste");
+            Object email = payload.get("email");
+            customer.put("email", email != null ? email : "usuario@teste.com");
+            intentPayload.put("customer", customer);
+            intentPayload.put("callbackUrl", payload.getOrDefault("callbackUrl", "http://localhost:3001/webhooks/trustpay"));
+            intentPayload.put("returnUrl", payload.getOrDefault("returnUrl", "http://localhost:3001/checkout/success"));
+            Map<String, Object> installments = new HashMap<>();
+            installments.put("quantity", 1);
+            intentPayload.put("installments", installments);
+            String rawBody = objectMapper.writeValueAsString(intentPayload);
+            System.out.println("[TRUSTPAY-DEBUG] Payload enviado ao proxy TrustPay:");
+            System.out.println(rawBody);
+            String method = "POST";
             String timestamp = String.valueOf(Instant.now().getEpochSecond());
+            String signature = calcularAssinatura(method, path, timestamp, rawBody, merchantSecret);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("x-api-key", merchantKey);
+            headers.set("x-timestamp", timestamp);
+            headers.set("x-signature", signature);
+            HttpEntity<String> request = new HttpEntity<>(rawBody, headers);
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, request, Map.class);
+            Map<String, Object> respBody = response.getBody();
+            if (response.getStatusCode() == HttpStatus.OK || response.getStatusCode() == HttpStatus.CREATED) {
+                if (respBody != null && Boolean.TRUE.equals(respBody.get("success"))) {
+                    Map<String, Object> data = (Map<String, Object>) respBody.get("data");
+                    if (data != null && data.containsKey("id")) {
+                        String id = data.get("id").toString();
+                        System.out.println("[TRUSTPAY-DEBUG] Payment Intent criado com id: " + id);
+                        return data;
+                    }
+                }
+            }
+            System.out.println("[TRUSTPAY-DEBUG] Resposta inesperada do TrustPay: " + respBody);
+            return respBody;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao criar intent de pagamento", e);
+        }
+    }
+
+    public Map<String, Object> consultarStatus(String intentId) {
+        try {
+            String method = "GET";
+            String path = "/api/merchant/v1/payments/" + intentId + "/status";
+            String url = pagamentoApiUrl + path;
+            String timestamp = String.valueOf(Instant.now().getEpochSecond());
+            String rawBody = ""; // GET não tem body
             String signature = calcularAssinatura(method, path, timestamp, rawBody, merchantSecret);
 
             HttpHeaders headers = new HttpHeaders();
@@ -138,26 +130,15 @@ public class PagamentoService {
             headers.set("x-timestamp", timestamp);
             headers.set("x-signature", signature);
 
-            HttpEntity<String> request = new HttpEntity<>(rawBody, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+            HttpEntity<String> request = new HttpEntity<>(null, headers);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
             Map<String, Object> responseMap = objectMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>(){});
-            // Exibir o campo 'id' da intent, se existir
-            Object id = null;
-            if (responseMap.containsKey("id")) {
-                id = responseMap.get("id");
-            } else if (responseMap.containsKey("data") && responseMap.get("data") instanceof Map) {
-                Map<String, Object> data = (Map<String, Object>) responseMap.get("data");
-                if (data.containsKey("id")) {
-                    id = data.get("id");
-                }
-            }
-            System.out.println("[TRUSTPAY-DEBUG] ID da intent criada: " + id);
             return removeStatus(responseMap);
         } catch (Exception e) {
-            e.printStackTrace(); // Log detalhado do erro no console
-            throw new RuntimeException("Erro ao criar intent de pagamento", e);
+            throw new RuntimeException("Erro ao consultar status do pagamento", e);
         }
     }
+
 
     public Map<String, Object> capturarPagamento(String intentId, Map<String, Object> payload) {
         System.out.println("CAPTURANDO PAGAMENTO");
@@ -202,34 +183,10 @@ public class PagamentoService {
             System.out.println("[TRUSTPAY-DEBUG] Resposta do proxy TrustPay (captura):");
             System.out.println(response.getBody());
             Map<String, Object> responseMap = objectMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>(){});
-            return removeStatus(responseMap);
+            return responseMap;
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Erro ao capturar pagamento", e);
-        }
-    }
-
-    public Map<String, Object> consultarStatus(String intentId) {
-        try {
-            String method = "GET";
-            String path = "/api/merchant/v1/payments/" + intentId + "/status";
-            String url = pagamentoApiUrl + path;
-            String timestamp = String.valueOf(Instant.now().getEpochSecond());
-            String rawBody = ""; // GET não tem body
-            String signature = calcularAssinatura(method, path, timestamp, rawBody, merchantSecret);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("x-api-key", merchantKey);
-            headers.set("x-timestamp", timestamp);
-            headers.set("x-signature", signature);
-
-            HttpEntity<String> request = new HttpEntity<>(null, headers);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
-            Map<String, Object> responseMap = objectMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>(){});
-            return removeStatus(responseMap);
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao consultar status do pagamento", e);
         }
     }
 

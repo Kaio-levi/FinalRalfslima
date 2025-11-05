@@ -4,9 +4,10 @@
 services:
   - type: web
     name: loja-backend
-    env: java
+    # Use Docker for deploy because Render may not expose a 'java' runtime option.
+    env: docker
     # path is repo root when this file is in the backend repo
     path: .
-    buildCommand: ./mvnw -B -DskipTests package
-    startCommand: java -Dserver.port=$PORT -jar target/*.jar
+    # Dockerfile will be used to build and run the service
+    dockerfilePath: Dockerfile
     plan: free

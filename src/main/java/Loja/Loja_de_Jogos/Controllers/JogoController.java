@@ -34,8 +34,8 @@ public class JogoController {
     }
 
     @PostMapping
-    public ResponseEntity<JogoDTO> criar(@RequestBody Jogo jogo) {
-        Jogo novoJogo = jogoService.criar(jogo);
+    public ResponseEntity<JogoDTO> criar(@RequestBody JogoCreateDTO jogoDto) {
+        Jogo novoJogo = jogoService.criarFromDto(jogoDto);
         return ResponseEntity.ok(new JogoDTO(novoJogo));
     }
 

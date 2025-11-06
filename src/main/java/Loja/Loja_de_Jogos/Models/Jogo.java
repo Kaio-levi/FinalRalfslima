@@ -1,5 +1,6 @@
 package Loja.Loja_de_Jogos.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Jogo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

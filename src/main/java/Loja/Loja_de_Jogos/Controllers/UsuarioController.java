@@ -36,4 +36,10 @@ public class UsuarioController {
         return ResponseEntity.ok(UsuarioDTO.fromEntity(novoUsuario));
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Long> contarUsuarios() {
+        long total = usuarioService.count();
+        return ResponseEntity.ok(total);
+    }
+
 }

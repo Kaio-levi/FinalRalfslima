@@ -49,4 +49,8 @@ public class UsuarioService {
         }
         return false;
     }
+
+    public long count() {
+        return usuarioRepository.count();
+    }
 }

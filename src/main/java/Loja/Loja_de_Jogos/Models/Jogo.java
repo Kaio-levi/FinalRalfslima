@@ -1,6 +1,5 @@
 package Loja.Loja_de_Jogos.Models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -50,7 +49,4 @@ public class Jogo {
     )
     private List<Categoria> categorias;
 
-    @OneToMany(mappedBy = "jogo", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Chave> chaves;
 }

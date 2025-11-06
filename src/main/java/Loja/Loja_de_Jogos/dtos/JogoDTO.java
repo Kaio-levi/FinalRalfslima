@@ -4,7 +4,7 @@ import Loja.Loja_de_Jogos.Models.Categoria;
 import Loja.Loja_de_Jogos.Models.Imagem;
 import Loja.Loja_de_Jogos.Models.Jogo;
 import Loja.Loja_de_Jogos.Models.Plataforma;
-import Loja.Loja_de_Jogos.Models.Chave;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,7 +28,7 @@ public class JogoDTO {
     public List<String> plataformas;
     public List<ImagemDTO> imagens;
     public List<CategoriaDTO> categorias;
-    public List<ChaveDTO> chaves;
+    // chaves removed
 
     public JogoDTO(Jogo jogo) {
         this.id = jogo.getId();
@@ -46,7 +46,6 @@ public class JogoDTO {
         this.placaDeVideo = jogo.getPlacaDeVideo();
         this.plataformas = jogo.getPlataformas() != null ? jogo.getPlataformas().stream().map(Plataforma::name).collect(Collectors.toList()) : null;
         this.imagens = jogo.getImagens() != null ? jogo.getImagens().stream().map(ImagemDTO::new).collect(Collectors.toList()) : null;
-        this.categorias = jogo.getCategorias() != null ? jogo.getCategorias().stream().map(CategoriaDTO::new).collect(Collectors.toList()) : null;
-        this.chaves = jogo.getChaves() != null ? jogo.getChaves().stream().map(ChaveDTO::new).collect(Collectors.toList()) : null;
+    this.categorias = jogo.getCategorias() != null ? jogo.getCategorias().stream().map(CategoriaDTO::new).collect(Collectors.toList()) : null;
     }
 }

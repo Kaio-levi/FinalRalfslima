@@ -1,0 +1,20 @@
+# Example Render service manifest (optional)
+# Adjust name, env, and region in the Render dashboard or via this file if you use the Render CLI
+
+services:
+  - type: web
+    name: loja-de-jogos-backend
+    env: docker
+    plan: free
+    buildCommand: ''
+    startCommand: ''
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: "jdbc:postgresql://ep-lingering-math-acntyo2q-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require"
+      - key: SPRING_DATASOURCE_USERNAME
+        value: "neondb_owner"
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: "npg_fAp3NsdClR5O"
+      - key: SERVER_PORT
+        value: "8080"

@@ -1,0 +1,13 @@
+target
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+.idea
+.classpath
+.project
+.settings
+.vscode
+node_modules
+gameStore-front/node_modules
+**/*.log
+**/*.tmp
+**/*.swp

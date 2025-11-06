@@ -1,6 +1,7 @@
 package Loja.Loja_de_Jogos.Controllers;
 
 import Loja.Loja_de_Jogos.Models.Jogo;
+import Loja.Loja_de_Jogos.dtos.JogoCreateDTO;
 import Loja.Loja_de_Jogos.dtos.JogoDTO;
 import Loja.Loja_de_Jogos.Repositories.JogoRepository;
 import Loja.Loja_de_Jogos.Services.JogoService;

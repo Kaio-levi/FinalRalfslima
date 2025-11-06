@@ -98,7 +98,7 @@ public class JogoService {
                 Imagem img = new Imagem();
                 img.setNome(im.nome != null ? im.nome : "");
                 img.setUrl(im.url);
-                img.setIsMainImage(im.isMainImage != null && im.isMainImage);
+                img.setMainImage(im.isMainImage != null && im.isMainImage);
                 img.setJogo(jogo);
                 imgs.add(img);
             }

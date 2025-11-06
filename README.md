@@ -175,29 +175,6 @@ Resposta esperada: um número (por exemplo `42`).
 - Banco: se o app não inicia, verifique a string JDBC, usuário, senha e se o banco aceita conexões (firewall, rede, Neon config).
 - Dependências: rode `./mvnw dependency:resolve` se houver problemas de dependências.
 
----
-
-## Screenshots
-
-Substitua as imagens abaixo com prints das telas do admin, usuários, listagem de jogos, criação de jogo, etc.
-
-### Painel Administrativo
-
-![Painel Admin - estatísticas](./docs/screenshots/admin-dashboard.png)
-
-### Lista de Usuários
-
-![Lista de Usuários](./docs/screenshots/users-list.png)
-
-### Tela de Edição de Jogo
-
-![Editar Jogo](./docs/screenshots/edit-game.png)
-
-> Crie a pasta `docs/screenshots` e coloque os PNGs com os nomes acima. Ajuste os caminhos se preferir.
-
----
-
-
 # Nome de cada integrante e responsabilidade
 
 | Nome     | Função de cada integrante     |
